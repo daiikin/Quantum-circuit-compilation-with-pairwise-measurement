@@ -1,4 +1,4 @@
-"""Weight-4/5 nondestructive Pauli measurement branches and r4/r5 rewrites.
+"""Arbitrary positive-weight nondestructive Pauli measurement branches.
 
 Requires zx_r4_r5.py alongside this file. Leftmost character is qubit 0.
 Each diagram is a Kraus operator K_m=(I+m*P)/2, not a classical-output wire.
@@ -38,13 +38,13 @@ def parse_pauli(text):
     if not text or any(c not in 'IXYZ' for c in text):
         raise ValueError('Use an optional +/- followed by I, X, Y, Z')
     support = tuple(i for i, p in enumerate(text) if p != 'I')
-    if len(support) not in (4, 5):
-        raise ValueError('Pauli weight (number of non-I factors) must be 4 or 5')
+    if not support:
+        raise ValueError('Pauli weight must be positive')
     return text, sign, support
 
 
 def pauli_measurement(pauli, outcome=1):
-    """Build a normalized branch and apply r4 or r5 to its central spider.
+    """Build a normalized branch; also apply a direct r4/r5 when applicable.
 
     Examples: 'XYZX', '-XYZXY', 'XIYZZI'. outcome is the eigenvalue of
     the SIGNED operator, +1 or -1. Supports arbitrary identity positions.
@@ -95,14 +95,37 @@ def pauli_measurement(pauli, outcome=1):
         g.add_edge(g.edge(current, out))
     g.set_inputs(tuple(ins))
     g.set_outputs(tuple(outs))
-    result = (r4 if len(support) == 4 else r5)(g, center, ports)
+    result = ((r4 if len(support) == 4 else r5)(g, center, ports)
+              if len(support) in (4, 5) else None)
     # Layout only: spread the replacement ring above the data wires.
-    for i, v in enumerate(result.ring):
+    for i, v in enumerate(result.ring if result is not None else ()):
         angle = 2*np.pi*i/len(ports)
         result.graph.set_row(v, 4 + 1.2*np.cos(angle))
         result.graph.set_qubit(v, -2 + .65*np.sin(angle))
-    return Measurement(word, sign, outcome, support, g, result.graph,
-                       center, tuple(ports), result.ring)
+    return Measurement(word, sign, outcome, support, g,
+                       result.graph if result is not None else None,
+                       center, tuple(ports), result.ring if result is not None else ())
+
+
+def generate_pauli_measurement(weight, *, seed=None, total_qubits=None, outcome=1, sign=1):
+    """Generate a reproducible random Pauli of exactly the requested weight.
+
+    Optional total_qubits >= weight inserts random identity positions.
+    For a specific string, use pauli_measurement instead.
+    """
+    import random
+    if not isinstance(weight, int) or isinstance(weight, bool) or weight < 1:
+        raise ValueError('weight must be a positive integer')
+    n = weight if total_qubits is None else total_qubits
+    if not isinstance(n, int) or isinstance(n, bool) or n < weight:
+        raise ValueError('total_qubits must be an integer >= weight')
+    if sign not in (-1, 1):
+        raise ValueError('sign must be +/-1')
+    rng = random.Random(seed)
+    word = ['I']*n
+    for q in sorted(rng.sample(range(n), weight)):
+        word[q] = rng.choice('XYZ')
+    return pauli_measurement(('-' if sign < 0 else '') + ''.join(word), outcome)
 
 
 def measurement_branches(pauli):
@@ -125,6 +148,8 @@ def verify(measurement):
     label = ('-' if measurement.sign < 0 else '') + measurement.pauli
     target = expected_projector(label, measurement.outcome)
     for g in (measurement.original, measurement.rewritten):
+        if g is None:
+            continue
         actual = zx.tensor.tensor_to_matrix(zx.tensor.tensorfy(g),
                                             len(g.inputs()), len(g.outputs()))
         np.testing.assert_allclose(actual, target, atol=1e-12)
@@ -137,14 +162,7 @@ def self_test():
             for m in (1, -1):
                 verify(pauli_measurement(''.join(letters), m))
                 count += 1
-    for label in ('-XYZX', '-XYZXY', 'IXYIZZI', '-IXYIZXYZI'):
-        # The last example deliberately has invalid weight six.
-        if label == '-IXYIZXYZI':
-            try:
-                pauli_measurement(label)
-            except ValueError:
-                continue
-            raise AssertionError('Invalid weight was accepted')
+    for label in ('-XYZX', '-XYZXY', 'IXYIZZI'):
         branches = measurement_branches(label)
         for branch in branches.values():
             verify(branch)
@@ -169,11 +187,13 @@ def main():
     m = pauli_measurement(args.pauli, args.outcome)
     verify(m)
     for suffix, g in (('before', m.original), ('after', m.rewritten)):
+        if g is None:
+            continue
         with open(f'{args.prefix}_{suffix}.json', 'w') as f:
             f.write(g.to_json())
         figure = zx.draw_matplotlib(g, labels=True)
         figure.savefig(f'{args.prefix}_{suffix}.svg', bbox_inches='tight')
-    print(f'Weight {len(m.support)}; applied r{len(m.support)}; projector verified.')
+    print(f'Weight {len(m.support)}; projector verified. Use compile_measurement for general extraction.')
     print(f'Saved {args.prefix}_before/after.json and .svg')
 
 
