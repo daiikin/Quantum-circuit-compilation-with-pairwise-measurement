@@ -1,0 +1,180 @@
+{
+  "outcome": {
+    "constant": 0,
+    "record_indices": [
+      4,
+      5
+    ],
+    "formula": "b4 xor b5"
+  },
+  "corrections": [
+    {
+      "data_output": 0,
+      "physical_wire": 0,
+      "x": {
+        "constant": 0,
+        "record_indices": [],
+        "formula": "0"
+      },
+      "z": {
+        "constant": 0,
+        "record_indices": [
+          0
+        ],
+        "formula": "b0"
+      }
+    },
+    {
+      "data_output": 1,
+      "physical_wire": 4,
+      "x": {
+        "constant": 0,
+        "record_indices": [
+          6
+        ],
+        "formula": "b6"
+      },
+      "z": {
+        "constant": 0,
+        "record_indices": [
+          4
+        ],
+        "formula": "b4"
+      }
+    },
+    {
+      "data_output": 2,
+      "physical_wire": 2,
+      "x": {
+        "constant": 0,
+        "record_indices": [
+          2
+        ],
+        "formula": "b2"
+      },
+      "z": {
+        "constant": 0,
+        "record_indices": [
+          1
+        ],
+        "formula": "b1"
+      }
+    },
+    {
+      "data_output": 3,
+      "physical_wire": 5,
+      "x": {
+        "constant": 0,
+        "record_indices": [
+          2,
+          7
+        ],
+        "formula": "b2 xor b7"
+      },
+      "z": {
+        "constant": 0,
+        "record_indices": [
+          5
+        ],
+        "formula": "b5"
+      }
+    }
+  ],
+  "checks": [
+    {
+      "constant": 0,
+      "record_indices": [
+        2,
+        3
+      ],
+      "formula": "b2 xor b3"
+    }
+  ],
+  "measurements": [
+    {
+      "index": 0,
+      "name": "MZZ",
+      "physical_wires": [
+        4,
+        0
+      ]
+    },
+    {
+      "index": 1,
+      "name": "MZZ",
+      "physical_wires": [
+        5,
+        2
+      ]
+    },
+    {
+      "index": 2,
+      "name": "MXX",
+      "physical_wires": [
+        4,
+        5
+      ]
+    },
+    {
+      "index": 3,
+      "name": "MXX",
+      "physical_wires": [
+        4,
+        5
+      ]
+    },
+    {
+      "index": 4,
+      "name": "MZZ",
+      "physical_wires": [
+        4,
+        1
+      ]
+    },
+    {
+      "index": 5,
+      "name": "MZZ",
+      "physical_wires": [
+        5,
+        3
+      ]
+    },
+    {
+      "index": 6,
+      "name": "MX",
+      "physical_wires": [
+        1
+      ]
+    },
+    {
+      "index": 7,
+      "name": "MX",
+      "physical_wires": [
+        3
+      ]
+    }
+  ],
+  "input_wires": [
+    4,
+    1,
+    5,
+    3
+  ],
+  "output_wires": [
+    0,
+    4,
+    2,
+    5
+  ],
+  "certificate": {
+    "symbolic_choi_generators": 8,
+    "free_record_bits": 7,
+    "valid_records_log2": 7,
+    "records_per_outcome_log2": 6,
+    "branch_projector_scale_squared_log2": -6,
+    "all_allowed_records_certified": true,
+    "grouped_instrument_normalized": true,
+    "signed_pauli": "+XXXX"
+  },
+  "semantics": "Unpostselected corrected measurement of the signed Pauli; noise-free"
+}
