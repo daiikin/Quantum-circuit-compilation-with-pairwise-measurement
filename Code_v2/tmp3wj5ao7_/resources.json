@@ -1,0 +1,14 @@
+{
+  "pauli": "+XXXX",
+  "weight": 4,
+  "data_qubits": 4,
+  "physical_qubits": 6,
+  "ancilla_qubits": 2,
+  "depth_pauli_frame": 5,
+  "depth_with_feedback": 9,
+  "outcome_ready_depth": 4,
+  "pair_measurements": 5,
+  "single_measurements": 2,
+  "quantum_operations": 17,
+  "feedback_operations": 10
+}

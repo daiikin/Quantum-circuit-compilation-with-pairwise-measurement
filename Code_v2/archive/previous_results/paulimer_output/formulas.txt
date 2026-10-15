@@ -1,0 +1,7 @@
+Measured Pauli: +ZZZZ
+Outcome bit: r = b3 xor b4
+Measured eigenvalue: (-1)^r
+D0 (physical p0): X^(b0), Z^(b2 xor b6)
+D1 (physical p4): X^(b3), Z^(b2 xor b5 xor b6)
+D2 (physical p2): X^(b1), Z^(b6)
+D3 (physical p5): X^(b4), Z^(0)
