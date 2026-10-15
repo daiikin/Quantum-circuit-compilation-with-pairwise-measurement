@@ -1,0 +1,8 @@
+# QDK-EC versions tested by this integration.
+paulimer==0.2.9
+binar==0.1.8
+# Existing compiler, renderer, and independent validation dependencies.
+pyzx==0.10.7
+stim==1.16.0
+matplotlib>=3.8
+numpy>=1.26
